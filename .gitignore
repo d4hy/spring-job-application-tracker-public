@@ -23,7 +23,7 @@ backend/.env
 
 # Root/local build artifacts
 target/
-data/
+/data/
 
 # IDE/project-local files
 .idea/
