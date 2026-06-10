@@ -1,0 +1,31 @@
+# Runtime logs (do not commit)
+boot-*.log
+smoke*.log
+*.log
+
+# Backend build output and local H2 database files
+backend/target/
+backend/data/*
+!backend/data/.gitkeep
+backend/.tmp*
+backend/.tmp-*
+
+# Frontend local artifacts
+frontend/.DS_Store
+frontend/__pycache__/
+frontend/node_modules/
+frontend/dist/
+
+# Local backend runtime env (do not commit secrets)
+.env
+.env.local
+backend/.env
+
+# Root/local build artifacts
+target/
+data/
+
+# IDE/project-local files
+.idea/
+*.iml
+.aiassistant/

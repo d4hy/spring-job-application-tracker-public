@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: job-tracker-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-job_tracker}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - job_tracker_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: job-tracker-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_DB_PROFILE: "postgres"
+      DB_URL: "jdbc:postgresql://postgres:5432/${POSTGRES_DB:-job_tracker}"
+      DB_USERNAME: "${POSTGRES_USER:-postgres}"
+      DB_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      JWT_SECRET: "${JWT_SECRET:-change-me-please-change-32-char-minimum}"
+      SERVER_PORT: "8080"
+      FRONTEND_BASE_URL: "http://localhost:${FRONTEND_PORT:-5173}"
+      FRONTEND_AUTO_OPEN: "false"
+      APP_CORS_ALLOWED_ORIGINS: "${APP_CORS_ALLOWED_ORIGINS:-http://localhost:*,http://127.0.0.1:*}"
+      APP_SEED_DEMO_DATA: "${APP_SEED_DEMO_DATA:-false}"
+      APP_OFFLINE_MODE: "${APP_OFFLINE_MODE:-false}"
+      APP_WORKDAY_AUTOFILL_ENABLED: "${APP_WORKDAY_AUTOFILL_ENABLED:-false}"
+      GMAIL_AUTO_SYNC_DELAY_MS: "${GMAIL_AUTO_SYNC_DELAY_MS:-300000}"
+      APP_GOOGLE_CLIENT_ID: "${APP_GOOGLE_CLIENT_ID:-local-google-client-id}"
+      APP_GOOGLE_CLIENT_SECRET: "${APP_GOOGLE_CLIENT_SECRET:-local-google-client-secret}"
+      APP_GOOGLE_OAUTH_REDIRECT_URI: "${APP_GOOGLE_OAUTH_REDIRECT_URI:-http://localhost:8080/api/integrations/google/callback}"
+      APP_GITHUB_CLIENT_ID: "${APP_GITHUB_CLIENT_ID:-local-github-client-id}"
+      APP_GITHUB_CLIENT_SECRET: "${APP_GITHUB_CLIENT_SECRET:-local-github-client-secret}"
+      CLOUD_BACKUP_UPLOAD_URL: "${CLOUD_BACKUP_UPLOAD_URL:-}"
+      CLOUD_BACKUP_API_KEY: "${CLOUD_BACKUP_API_KEY:-}"
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: job-tracker-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+
+volumes:
+  job_tracker_postgres_data:

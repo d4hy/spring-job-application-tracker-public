@@ -1,0 +1,15 @@
+# ==================== POSTGRESQL DATABASE CONFIGURATION ====================
+spring:
+  datasource:
+    url: "${DB_URL:jdbc:postgresql://localhost:5432/job_tracker}"
+    driver-class-name: org.postgresql.Driver
+    username: "${DB_USERNAME:postgres}"
+    password: "${DB_PASSWORD:postgres}"
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  # Disable H2 console when PostgreSQL profile is active
+  h2:
+    console:
+      enabled: false

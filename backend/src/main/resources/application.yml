@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: spring-job-application-tracker
+  # Load env values from .env without failing to startup if the file is missing.
+  # `import` lists files Spring should try to load.
+  # `-` means one item in that list.
+  # `optional:` means skip missing files instead of failing to start up.
+  # `[.properties]` tells Spring to parse `.env` as a properties format (not YAML syntax).
+  # Use ./.env when running from backend/.
+  # Use ./backend/.env when running from the repo root.
+  config:
+    import:
+      - optional:file:./.env[.properties]
+      - optional:file:./backend/.env[.properties]
+
+  # ==================== DATABASE PROFILE ====================
+  # Supported: h2, postgres
+  # Uses H2 by default for local persistence unless an active profile is supplied.
+  profiles:
+    default: "${APP_DB_PROFILE:h2}"
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  # ==================== OAUTH2 CONFIGURATION ====================
+  # Google OAuth2
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "${APP_GOOGLE_CLIENT_ID:local-google-client-id}"
+            client-secret: "${APP_GOOGLE_CLIENT_SECRET:local-google-client-secret}"
+            scope: "openid,email,profile,https://www.googleapis.com/auth/gmail.readonly,https://www.googleapis.com/auth/spreadsheets"
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          # GitHub OAuth2
+          github:
+            client-id: "${APP_GITHUB_CLIENT_ID:local-github-client-id}"
+            client-secret: "${APP_GITHUB_CLIENT_SECRET:local-github-client-secret}"
+            scope: "user:email"
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+
+  # ==================== THYMELEAF CONFIGURATION ====================
+  thymeleaf:
+    cache: false
+
+server:
+  port: "${SERVER_PORT:8080}"
+
+app:
+  gmail:
+    auto-sync-delay-ms: "${GMAIL_AUTO_SYNC_DELAY_MS:300000}"
+  frontend:
+    base-url: "${FRONTEND_BASE_URL:http://localhost:5173}"
+    auto-open: "${FRONTEND_AUTO_OPEN:true}"
+  offline-mode: "${APP_OFFLINE_MODE:false}"
+  seed:
+    demo-data: "${APP_SEED_DEMO_DATA:false}"
+  cors:
+    allowed-origins: "${APP_CORS_ALLOWED_ORIGINS:http://localhost:*,http://127.0.0.1:*,https://localhost:*,https://127.0.0.1:*}"
+  cloud-backup:
+    upload-url: "${CLOUD_BACKUP_UPLOAD_URL:}"
+    api-key: "${CLOUD_BACKUP_API_KEY:}"
+  workday:
+    autofill:
+      enabled: "${APP_WORKDAY_AUTOFILL_ENABLED:true}"
+      node-command: "${APP_WORKDAY_AUTOFILL_NODE_CMD:node}"
+      script-path: "${APP_WORKDAY_AUTOFILL_SCRIPT_PATH:../frontend/scripts/workday-autofill.mjs}"
+
+  # ==================== JWT CONFIGURATION ====================
+  jwt:
+    secret: "${JWT_SECRET:change-me-please-change-32-char-minimum}"
+    expiration-minutes: 60
+
+  google:
+    oauth:
+      redirect-uri: "${APP_GOOGLE_OAUTH_REDIRECT_URI:http://localhost:8080/api/integrations/google/callback}"

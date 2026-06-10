@@ -1,0 +1,4 @@
+app:
+  offline-mode: true
+  frontend:
+    auto-open: false
