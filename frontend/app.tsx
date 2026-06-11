@@ -563,12 +563,21 @@ async function updateSavedJobDetails(token, jobId, updates) {
     body: JSON.stringify(updates)
   });
 
-  const payload = await response.json().catch(() => ({}));
+  const { payload, rawText } = await readResponsePayload(response);
   if (response.status === 401 || response.status === 403) {
     throw new Error(UNAUTHORIZED_MARKER);
   }
   if (!response.ok) {
-    throw new Error(parseError(payload, "Could not update saved job details."));
+    const fallback = "Could not update saved job details.";
+    const message = parseError(payload, "");
+    if (message) {
+      throw new Error(message);
+    }
+    const rawMessage = rawText.trim();
+    if (rawMessage) {
+      throw new Error(`${fallback} (HTTP ${response.status}): ${rawMessage.slice(0, 280)}`);
+    }
+    throw new Error(`${fallback} (HTTP ${response.status})`);
   }
   return payload;
 }
