@@ -2538,10 +2538,10 @@ function App() {
             <table className="min-w-[1180px] w-full table-fixed divide-y divide-[#bcb8ad] text-xs sm:text-sm dark:divide-[#596072]">
               <thead className="bg-[#7a6399] dark:bg-[#6a558d]">
                 <tr>
-                  <th scope="col" className="w-[4%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]" aria-label="Select rows">
+                  <th scope="col" className="w-[6%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]" aria-label="Select rows">
                     <span className="sr-only">Select row</span>
                   </th>
-                  <th scope="col" className="w-[20%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Title</th>
+                  <th scope="col" className="w-[18%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Title</th>
                   <th scope="col" className="w-[10%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Company</th>
                   <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Board</th>
                   <th scope="col" className="w-[10%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Location</th>
@@ -2589,8 +2589,11 @@ function App() {
                     : "opacity-0 pointer-events-none group-hover/checkbox:opacity-100 group-hover/checkbox:pointer-events-auto";
                   return (
                   <tr key={`${job.id}-${job.createdAt || ""}`} className="bg-[#ffffff] odd:bg-[#ffffff] even:bg-[#f5f1fd] dark:bg-[#2d323c] dark:odd:bg-[#2d323c] dark:even:bg-[#252b34]">
-                    <td className="group/checkbox px-2 py-1.5 align-top">
+                    <td className="group/checkbox px-1 py-1.5 align-top">
                       <div className="flex items-center gap-1">
+                        <span className="w-5 shrink-0 text-right text-xs font-bold text-[#7a6399] dark:text-[#b8a9cf]" title={dailyAppliedNumber ? `Applied number ${dailyAppliedNumber} on ${savedAtLabel}` : ""}>
+                          {dailyAppliedNumber || ""}
+                        </span>
                         <input
                           className={`${tableCheckboxClass} transition-opacity duration-150 ${rowCheckboxVisibilityClass}`}
                           type="checkbox"
@@ -2614,11 +2617,7 @@ function App() {
                       </div>
                     </td>
                     <td className="px-2 py-1.5 align-top font-semibold text-[#2f333a] dark:text-[#f2ebdc]">
-                      <div className="flex items-start gap-2">
-                        <span className="mt-0.5 w-7 shrink-0 text-right text-xs font-bold text-[#7a6399] dark:text-[#b8a9cf]" title={dailyAppliedNumber ? `Applied number ${dailyAppliedNumber} on ${savedAtLabel}` : ""}>
-                          {dailyAppliedNumber || ""}
-                        </span>
-                        <div className="min-w-0 flex-1">
+                      <div className="min-w-0">
                           {isEditing ? (
                             <div className="space-y-2">
                               <input
@@ -2648,7 +2647,6 @@ function App() {
                               ) : null}
                             </div>
                           )}
-                        </div>
                       </div>
                     </td>
                     <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0]">
