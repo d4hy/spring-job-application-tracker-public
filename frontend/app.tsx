@@ -633,6 +633,20 @@ function formatSavedAt(value) {
   });
 }
 
+function getLocalDateKey(value) {
+  if (!value) {
+    return "";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function isSameLocalDay(leftDate, rightDate) {
   return leftDate.getFullYear() === rightDate.getFullYear()
     && leftDate.getMonth() === rightDate.getMonth()
@@ -2164,6 +2178,23 @@ function App() {
       return terms.every((term) => haystack.includes(term));
     });
   }, [savedJobs, normalizedSavedJobsSearch]);
+  const savedJobDailyNumbering = useMemo(() => {
+    const countByDate = new Map();
+    const numberById = new Map();
+    savedJobs.forEach((job) => {
+      if (normalizeText(job.statusLaneName) === "wish list") {
+        return;
+      }
+      const dateKey = getLocalDateKey(job.createdAt);
+      if (!dateKey) {
+        return;
+      }
+      const nextNumber = (countByDate.get(dateKey) || 0) + 1;
+      countByDate.set(dateKey, nextNumber);
+      numberById.set(job.id, nextNumber);
+    });
+    return { countByDate, numberById };
+  }, [savedJobs]);
   const appliedTodayCount = useMemo(() => {
     const today = new Date();
     return savedJobs.reduce((count, job) => {
@@ -2504,7 +2535,7 @@ function App() {
                   <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Salary</th>
                   <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Source</th>
                   <th scope="col" className="w-[7%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Status</th>
-                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Saved</th>
+                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Saved / #</th>
                   <th scope="col" className="w-[6%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Link</th>
                   <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Progress</th>
                 </tr>
@@ -2535,6 +2566,13 @@ function App() {
                   const notesLabel = rowNotes || "No notes";
                   const sourceLabel = sourceFromUrl(rowJobUrl);
                   const savedAtLabel = formatSavedAt(job.createdAt);
+                  const savedDateKey = getLocalDateKey(job.createdAt);
+                  const dailyAppliedNumber = savedJobDailyNumbering.numberById.get(job.id);
+                  const dailyAppliedTotal = savedDateKey ? savedJobDailyNumbering.countByDate.get(savedDateKey) : undefined;
+                  const dailyAppliedLabel = dailyAppliedNumber ? `App #${dailyAppliedNumber}/${dailyAppliedTotal || dailyAppliedNumber}` : "Saved";
+                  const dailyAppliedTitle = dailyAppliedNumber
+                    ? `Applied job ${dailyAppliedNumber} of ${dailyAppliedTotal || dailyAppliedNumber} on ${savedAtLabel}`
+                    : `Saved on ${savedAtLabel}; not counted as applied`;
                   const rowActionBusy = savedJobsActionBusy || (editingJobId !== null && !isEditing);
                   const rowCheckboxVisibilityClass = isSelected
                     ? "opacity-100"
@@ -2649,7 +2687,17 @@ function App() {
                     <td className="px-2 py-1.5 align-top">
                       <span className={statusBadgeClass(job.statusLaneName)}>{displayStatusLaneLabel(job.statusLaneName)}</span>
                     </td>
-                    <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0] whitespace-nowrap">{savedAtLabel}</td>
+                    <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0] whitespace-nowrap">
+                      <div className="space-y-1">
+                        <span className="block">{savedAtLabel}</span>
+                        <span
+                          className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] ${dailyAppliedNumber ? "border-[#7a6399] bg-[#f3efff] text-[#4f4268] dark:border-[#8f7ab3] dark:bg-[#312b3c] dark:text-[#d8cbed]" : "border-[#8a8f9d] bg-[#edf0f5] text-[#5c626d] dark:border-[#5b6170] dark:bg-[#343840] dark:text-[#c8c0b2]"}`}
+                          title={dailyAppliedTitle}
+                        >
+                          {dailyAppliedLabel}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-2 py-1.5 align-top">
                       {isEditing ? (
                         <input
