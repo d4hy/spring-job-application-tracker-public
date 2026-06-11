@@ -2538,10 +2538,10 @@ function App() {
             <table className="min-w-[1180px] w-full table-fixed divide-y divide-[#bcb8ad] text-xs sm:text-sm dark:divide-[#596072]">
               <thead className="bg-[#7a6399] dark:bg-[#6a558d]">
                 <tr>
-                  <th scope="col" className="w-[6%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]" aria-label="Select rows">
+                  <th scope="col" className="w-[7%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]" aria-label="Select rows">
                     <span className="sr-only">Select row</span>
                   </th>
-                  <th scope="col" className="w-[18%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Title</th>
+                  <th scope="col" className="w-[17%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Title</th>
                   <th scope="col" className="w-[10%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Company</th>
                   <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Board</th>
                   <th scope="col" className="w-[10%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Location</th>
@@ -2590,8 +2590,8 @@ function App() {
                   return (
                   <tr key={`${job.id}-${job.createdAt || ""}`} className="bg-[#ffffff] odd:bg-[#ffffff] even:bg-[#f5f1fd] dark:bg-[#2d323c] dark:odd:bg-[#2d323c] dark:even:bg-[#252b34]">
                     <td className="group/checkbox px-1 py-1.5 align-top">
-                      <div className="flex items-center gap-1">
-                        <span className="w-5 shrink-0 text-right text-xs font-bold text-[#7a6399] dark:text-[#b8a9cf]" title={dailyAppliedNumber ? `Applied number ${dailyAppliedNumber} on ${savedAtLabel}` : ""}>
+                      <div className="flex items-start gap-1">
+                        <span className="w-8 shrink-0 text-left font-mono text-xs font-bold leading-5 tabular-nums text-[#7a6399] dark:text-[#b8a9cf]" title={dailyAppliedNumber ? `Applied number ${dailyAppliedNumber} on ${savedAtLabel}` : ""}>
                           {dailyAppliedNumber || ""}
                         </span>
                         <input
