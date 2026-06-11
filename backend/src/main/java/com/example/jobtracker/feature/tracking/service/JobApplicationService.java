@@ -509,14 +509,12 @@ public class JobApplicationService {
 
             String host = uri.getHost();
             if (!isBlank(host) && shouldStripAllQueryParameters(host)) {
-                URI noQueryNoFragment = new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null);
-                return noQueryNoFragment.toString();
+                return buildUriStringWithoutFragment(uri, null);
             }
             
             String rawQuery = uri.getRawQuery();
             if (isBlank(rawQuery)) {
-                URI noFragment = new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null);
-                return noFragment.toString();
+                return buildUriStringWithoutFragment(uri, null);
             }
 
             
@@ -542,13 +540,29 @@ public class JobApplicationService {
             }
 
             String normalizedQuery = retained.isEmpty() ? null : String.join("&", retained);
-            URI normalized = new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), normalizedQuery, null);
-            return normalized.toString();
+            return buildUriStringWithoutFragment(uri, normalizedQuery);
         
         
         } catch (Exception ignored) {
             return trimmed;
         }
+    }
+
+    private String buildUriStringWithoutFragment(URI uri, String rawQuery) {
+        StringBuilder normalized = new StringBuilder();
+        if (uri.getScheme() != null) {
+            normalized.append(uri.getScheme()).append(':');
+        }
+        if (uri.getRawAuthority() != null) {
+            normalized.append("//").append(uri.getRawAuthority());
+        }
+        if (uri.getRawPath() != null) {
+            normalized.append(uri.getRawPath());
+        }
+        if (!isBlank(rawQuery)) {
+            normalized.append('?').append(rawQuery);
+        }
+        return URI.create(normalized.toString()).toString();
     }
 
     private boolean isTrackingQueryParameter(String decodedKey) {

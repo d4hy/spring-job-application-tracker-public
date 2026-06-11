@@ -96,6 +96,44 @@ class JobApplicationUpdateDetailsTest {
                 .andExpect(jsonPath("$.message").value("title cannot be blank"));
     }
 
+    @Test
+    void updateJobApplication_acceptsLongJobUrl() throws Exception {
+        String token = registerUserAndGetToken();
+        BoardColumnIds ids = fetchBoardColumnIds(token);
+        Long createdJobId = createWishListJob(token, ids.boardId(), ids.wishListColumnId());
+        String longJobUrl = "https://example.com/jobs/" + "a".repeat(280);
+        String updateBody = String.format("{\"jobUrl\":\"%s\"}", longJobUrl);
+
+        mockMvc.perform(put("/api/jobs/{id}", createdJobId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.jobUrl").value(longJobUrl));
+
+        mockMvc.perform(get("/api/jobs/saved")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].jobUrl").value(longJobUrl));
+    }
+
+    @Test
+    void updateJobApplication_preservesEncodedJobUrlParameters() throws Exception {
+        String token = registerUserAndGetToken();
+        BoardColumnIds ids = fetchBoardColumnIds(token);
+        Long createdJobId = createWishListJob(token, ids.boardId(), ids.wishListColumnId());
+        String encodedUrl = "https://www.governmentjobs.com/careers/washington?category%5B0%5D=IT%20and%20Computers&sort=PositionTitle%7CAscending&utm_source=test#details";
+        String expectedUrl = "https://www.governmentjobs.com/careers/washington?category%5B0%5D=IT%20and%20Computers&sort=PositionTitle%7CAscending";
+        String updateBody = String.format("{\"jobUrl\":\"%s\"}", encodedUrl);
+
+        mockMvc.perform(put("/api/jobs/{id}", createdJobId)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.jobUrl").value(expectedUrl));
+    }
+
     private BoardColumnIds fetchBoardColumnIds(String token) throws Exception {
         MvcResult boardResult = mockMvc.perform(get("/api/boards")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
