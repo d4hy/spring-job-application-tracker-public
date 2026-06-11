@@ -2467,44 +2467,43 @@ function App() {
           </p>
           <div className="mt-3 grid gap-2 sm:max-w-[420px]">
             <label className="text-xs font-semibold uppercase tracking-[0.08em] text-[#5a4e74] dark:text-[#b8a9cf]">
-              Search Title, Company, or Board
+              Search Title, Company, Board, Location, or Notes
             </label>
             <input
               className={inputClass}
               type="search"
               value={savedJobsSearch}
               onChange={(event) => setSavedJobsSearch(event.target.value)}
-              placeholder="e.g. internship, full-time, openai"
-              aria-label="Search saved jobs by title, company, or board"
+              placeholder="e.g. internship, full-time, openai, remote"
+              aria-label="Search saved jobs by title, company, board, location, or notes"
             />
             <p className="text-xs text-[#666a70] dark:text-[#b8b0a0]">
               Showing {filteredSavedJobs.length} of {savedJobs.length} saved job{savedJobs.length === 1 ? "" : "s"}.
             </p>
           </div>
           <div className="mt-3 max-h-[32rem] overflow-auto border-2 border-[#4a4c4d] dark:border-[#687083]">
-            <table className="min-w-[1480px] w-full table-fixed divide-y divide-[#bcb8ad] text-xs sm:text-sm dark:divide-[#596072]">
+            <table className="min-w-[1180px] w-full table-fixed divide-y divide-[#bcb8ad] text-xs sm:text-sm dark:divide-[#596072]">
               <thead className="bg-[#7a6399] dark:bg-[#6a558d]">
                 <tr>
                   <th scope="col" className="w-[4%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]" aria-label="Select rows">
                     <span className="sr-only">Select row</span>
                   </th>
-                  <th scope="col" className="w-[16%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Title</th>
-                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Company</th>
-                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Board</th>
-                  <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Location</th>
-                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Salary</th>
-                  <th scope="col" className="w-[7%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Source</th>
+                  <th scope="col" className="w-[20%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Title</th>
+                  <th scope="col" className="w-[10%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Company</th>
+                  <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Board</th>
+                  <th scope="col" className="w-[10%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Location</th>
+                  <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Salary</th>
+                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Source</th>
                   <th scope="col" className="w-[7%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Status</th>
                   <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Saved</th>
-                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Link</th>
-                  <th scope="col" className="w-[12%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Notes</th>
+                  <th scope="col" className="w-[6%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Link</th>
                   <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Progress</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#c2bcae] dark:divide-[#52596b]">
                 {filteredSavedJobs.length === 0 && (
                   <tr>
-                    <td colSpan={12} className="px-4 py-8 text-center text-sm text-[#666a70] dark:text-[#b8b0a0]">
+                    <td colSpan={11} className="px-4 py-8 text-center text-sm text-[#666a70] dark:text-[#b8b0a0]">
                       {savedJobs.length === 0
                         ? "No saved jobs yet."
                         : "No jobs match your search."}
@@ -2562,15 +2561,33 @@ function App() {
                     </td>
                     <td className="px-2 py-1.5 align-top font-semibold text-[#2f333a] dark:text-[#f2ebdc]">
                       {isEditing ? (
-                        <input
-                          className={tableInlineInputClass}
-                          value={editingJobDraft.jobTitle}
-                          onChange={(event) => handleEditSavedJobFieldChange("jobTitle", event.target.value)}
-                          disabled={savedJobsActionBusy}
-                          aria-label="Edit title"
-                        />
+                        <div className="space-y-2">
+                          <input
+                            className={tableInlineInputClass}
+                            value={editingJobDraft.jobTitle}
+                            onChange={(event) => handleEditSavedJobFieldChange("jobTitle", event.target.value)}
+                            disabled={savedJobsActionBusy}
+                            aria-label="Edit title"
+                          />
+                          <textarea
+                            className={tableInlineTextareaClass}
+                            value={editingJobDraft.notes}
+                            onChange={(event) => handleEditSavedJobFieldChange("notes", event.target.value)}
+                            disabled={savedJobsActionBusy}
+                            rows={2}
+                            placeholder="Notes"
+                            aria-label="Edit notes"
+                          />
+                        </div>
                       ) : (
-                        <span className="block truncate" title={titleLabel}>{titleLabel}</span>
+                        <div className="space-y-1">
+                          <span className="block truncate" title={titleLabel}>{titleLabel}</span>
+                          {rowNotes ? (
+                            <span className="block truncate text-[11px] font-medium text-[#666a70] dark:text-[#b8b0a0]" title={notesLabel}>
+                              Note: {notesLabel}
+                            </span>
+                          ) : null}
+                        </div>
                       )}
                     </td>
                     <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0]">
@@ -2647,22 +2664,6 @@ function App() {
                             Open Link
                           </a>
                         ) : "N/A"
-                      )}
-                    </td>
-                    <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0]">
-                      {isEditing ? (
-                        <textarea
-                          className={tableInlineTextareaClass}
-                          value={editingJobDraft.notes}
-                          onChange={(event) => handleEditSavedJobFieldChange("notes", event.target.value)}
-                          disabled={savedJobsActionBusy}
-                          rows={2}
-                          aria-label="Edit notes"
-                        />
-                      ) : (
-                        <span className="block max-h-12 overflow-hidden whitespace-pre-wrap break-words text-xs leading-5" title={notesLabel}>
-                          {notesLabel}
-                        </span>
                       )}
                     </td>
                     <td className="px-2 py-1.5 align-top">
