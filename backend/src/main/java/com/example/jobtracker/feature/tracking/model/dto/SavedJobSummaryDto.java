@@ -28,6 +28,9 @@ public class SavedJobSummaryDto {
     /** Source URL for the job posting. */
     private String jobUrl;
 
+    /** Optional user notes for this saved job. */
+    private String notes;
+
     /** Name of the board containing this job. */
     private String boardName;
 
@@ -46,6 +49,7 @@ public class SavedJobSummaryDto {
                                    String location,
                                    String salary,
                                    String jobUrl,
+                                   String notes,
                                    String boardName,
                                    String statusLaneName,
                                    LocalDateTime createdAt) {
@@ -55,6 +59,7 @@ public class SavedJobSummaryDto {
         this.location = location;
         this.salary = salary;
         this.jobUrl = jobUrl;
+        this.notes = notes;
         this.boardName = boardName;
         this.statusLaneName = statusLaneName;
         this.createdAt = createdAt;
@@ -106,6 +111,14 @@ public class SavedJobSummaryDto {
 
     public void setJobUrl(String jobUrl) {
         this.jobUrl = jobUrl;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public String getBoardName() {

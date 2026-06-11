@@ -69,6 +69,17 @@ class JobApplicationUpdateDetailsTest {
                 .andExpect(jsonPath("$.salary").value("$150,000 / year"))
                 .andExpect(jsonPath("$.jobUrl").value("https://example.com/role/42"))
                 .andExpect(jsonPath("$.notes").value("Updated from saved jobs view"));
+
+        mockMvc.perform(get("/api/jobs/saved")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(createdJobId))
+                .andExpect(jsonPath("$[0].jobTitle").value("Senior Backend Engineer"))
+                .andExpect(jsonPath("$[0].companyName").value("Acme Renamed"))
+                .andExpect(jsonPath("$[0].location").value("Austin, TX"))
+                .andExpect(jsonPath("$[0].salary").value("$150,000 / year"))
+                .andExpect(jsonPath("$[0].jobUrl").value("https://example.com/role/42"))
+                .andExpect(jsonPath("$[0].notes").value("Updated from saved jobs view"));
     }
 
     @Test

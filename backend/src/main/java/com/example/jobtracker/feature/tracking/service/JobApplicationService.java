@@ -314,6 +314,7 @@ public class JobApplicationService {
                         job.getLocation(),
                         job.getSalary(),
                         job.getJobUrl(),
+                        job.getNotes(),
                         job.getColumn().getBoard().getName(),
                         job.getColumn().getName(),
                         job.getCreatedAt()

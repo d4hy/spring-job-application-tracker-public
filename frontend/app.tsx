@@ -1952,7 +1952,7 @@ function App() {
       location: job.location || "",
       salary: job.salary || "",
       jobUrl: job.jobUrl || "",
-      notes: ""
+      notes: job.notes || ""
     });
   };
 
@@ -1984,7 +1984,8 @@ function App() {
         companyName: editingJobDraft.companyName,
         location: editingJobDraft.location,
         salary: editingJobDraft.salary,
-        jobUrl: editingJobDraft.jobUrl
+        jobUrl: editingJobDraft.jobUrl,
+        notes: editingJobDraft.notes
       });
       await refreshSavedJobs(auth.token);
       setSavedJobsError(false);
@@ -2139,6 +2140,7 @@ function App() {
   };
   const tableCheckboxClass = "h-4 w-4 cursor-pointer border-2 border-[#4a4c4d] accent-[#7a6399] focus:ring-2 focus:ring-[#7a6399] dark:border-[#8f7ab3] dark:bg-[#201a2f] dark:accent-[#b8a9cf]";
   const tableInlineInputClass = "w-full rounded border border-[#8a8f9d] bg-[#ffffff] px-2 py-1 text-xs text-[#23262c] outline-none transition focus:border-[#7a6399] dark:border-[#6f7688] dark:bg-[#1f2430] dark:text-[#ece6d8] dark:focus:border-[#b8a9cf]";
+  const tableInlineTextareaClass = `${tableInlineInputClass} min-h-[3.25rem] resize-y`;
   const rowActionButtonClass = "whitespace-nowrap border-2 border-[#4a4c4d] bg-[#f3efff] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#3f335a] transition hover:bg-[#e6dcfb] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#5b6170] dark:bg-[#343840] dark:text-[#ece4d6] dark:hover:bg-[#444955]";
   const rowSaveButtonClass = "whitespace-nowrap border-2 border-[#4a4c4d] bg-[#7a6399] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[#f3ecff] transition hover:bg-[#6a558d] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#5b6170] dark:bg-[#6a558d] dark:text-[#f3ecff] dark:hover:bg-[#7a6399]";
   const hoverEditIconButtonClass = "inline-flex h-6 w-6 items-center justify-center rounded border border-[#5f566f] bg-[#f8f4ff] text-[#4f4268] transition hover:bg-[#e9defd] disabled:cursor-not-allowed disabled:opacity-60 dark:border-[#6f7688] dark:bg-[#2c3240] dark:text-[#d7ccbc] dark:hover:bg-[#394153]";
@@ -2149,7 +2151,7 @@ function App() {
     }
     const terms = normalizedSavedJobsSearch.split(/\s+/).filter(Boolean);
     return savedJobs.filter((job) => {
-      const haystack = `${job.jobTitle || ""} ${job.companyName || ""} ${job.boardName || ""}`.toLowerCase();
+      const haystack = `${job.jobTitle || ""} ${job.companyName || ""} ${job.boardName || ""} ${job.location || ""} ${job.notes || ""}`.toLowerCase();
       return terms.every((term) => haystack.includes(term));
     });
   }, [savedJobs, normalizedSavedJobsSearch]);
@@ -2480,28 +2482,29 @@ function App() {
             </p>
           </div>
           <div className="mt-3 max-h-[32rem] overflow-auto border-2 border-[#4a4c4d] dark:border-[#687083]">
-            <table className="min-w-[1320px] w-full table-fixed divide-y divide-[#bcb8ad] text-xs sm:text-sm dark:divide-[#596072]">
+            <table className="min-w-[1480px] w-full table-fixed divide-y divide-[#bcb8ad] text-xs sm:text-sm dark:divide-[#596072]">
               <thead className="bg-[#7a6399] dark:bg-[#6a558d]">
                 <tr>
                   <th scope="col" className="w-[4%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]" aria-label="Select rows">
                     <span className="sr-only">Select row</span>
                   </th>
-                  <th scope="col" className="w-[18%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Title</th>
+                  <th scope="col" className="w-[16%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Title</th>
                   <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Company</th>
-                  <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Board</th>
-                  <th scope="col" className="w-[11%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Location</th>
+                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Board</th>
+                  <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Location</th>
                   <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Salary</th>
                   <th scope="col" className="w-[7%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Source</th>
                   <th scope="col" className="w-[7%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Status</th>
                   <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Saved</th>
                   <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Link</th>
+                  <th scope="col" className="w-[12%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Notes</th>
                   <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Progress</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#c2bcae] dark:divide-[#52596b]">
                 {filteredSavedJobs.length === 0 && (
                   <tr>
-                    <td colSpan={11} className="px-4 py-8 text-center text-sm text-[#666a70] dark:text-[#b8b0a0]">
+                    <td colSpan={12} className="px-4 py-8 text-center text-sm text-[#666a70] dark:text-[#b8b0a0]">
                       {savedJobs.length === 0
                         ? "No saved jobs yet."
                         : "No jobs match your search."}
@@ -2516,10 +2519,12 @@ function App() {
                   const rowLocation = isEditing ? editingJobDraft.location : (job.location || "");
                   const rowSalary = isEditing ? editingJobDraft.salary : (job.salary || "");
                   const rowJobUrl = isEditing ? editingJobDraft.jobUrl : (job.jobUrl || "");
+                  const rowNotes = isEditing ? editingJobDraft.notes : (job.notes || "");
                   const compactLocation = formatCompactLocation(rowLocation);
                   const titleLabel = rowTitle || "Not found";
                   const companyLabel = rowCompany || "Not found";
                   const salaryLabel = rowSalary || "Not listed";
+                  const notesLabel = rowNotes || "No notes";
                   const sourceLabel = sourceFromUrl(rowJobUrl);
                   const savedAtLabel = formatSavedAt(job.createdAt);
                   const rowActionBusy = savedJobsActionBusy || (editingJobId !== null && !isEditing);
@@ -2642,6 +2647,22 @@ function App() {
                             Open Link
                           </a>
                         ) : "N/A"
+                      )}
+                    </td>
+                    <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0]">
+                      {isEditing ? (
+                        <textarea
+                          className={tableInlineTextareaClass}
+                          value={editingJobDraft.notes}
+                          onChange={(event) => handleEditSavedJobFieldChange("notes", event.target.value)}
+                          disabled={savedJobsActionBusy}
+                          rows={2}
+                          aria-label="Edit notes"
+                        />
+                      ) : (
+                        <span className="block max-h-12 overflow-hidden whitespace-pre-wrap break-words text-xs leading-5" title={notesLabel}>
+                          {notesLabel}
+                        </span>
                       )}
                     </td>
                     <td className="px-2 py-1.5 align-top">
