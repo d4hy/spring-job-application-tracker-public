@@ -2180,7 +2180,6 @@ function App() {
   }, [savedJobs, normalizedSavedJobsSearch]);
   const savedJobDailyNumbering = useMemo(() => {
     const countByDate = new Map();
-    const numberById = new Map();
     savedJobs.forEach((job) => {
       if (normalizeText(job.statusLaneName) === "wish list") {
         return;
@@ -2189,11 +2188,25 @@ function App() {
       if (!dateKey) {
         return;
       }
-      const nextNumber = (countByDate.get(dateKey) || 0) + 1;
-      countByDate.set(dateKey, nextNumber);
-      numberById.set(job.id, nextNumber);
+      countByDate.set(dateKey, (countByDate.get(dateKey) || 0) + 1);
     });
-    return { countByDate, numberById };
+
+    const remainingByDate = new Map(countByDate);
+    const numberById = new Map();
+    savedJobs.forEach((job) => {
+      if (normalizeText(job.statusLaneName) === "wish list") {
+        return;
+      }
+      const dateKey = getLocalDateKey(job.createdAt);
+      const nextNumber = remainingByDate.get(dateKey);
+      if (!nextNumber) {
+        return;
+      }
+      numberById.set(job.id, nextNumber);
+      remainingByDate.set(dateKey, nextNumber - 1);
+    });
+
+    return { numberById };
   }, [savedJobs]);
   const appliedTodayCount = useMemo(() => {
     const today = new Date();
@@ -2535,7 +2548,7 @@ function App() {
                   <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Salary</th>
                   <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Source</th>
                   <th scope="col" className="w-[7%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Status</th>
-                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Saved / #</th>
+                  <th scope="col" className="w-[8%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Saved</th>
                   <th scope="col" className="w-[6%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Link</th>
                   <th scope="col" className="w-[9%] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[#f3ecff] dark:text-[#f3ecff]">Progress</th>
                 </tr>
@@ -2566,13 +2579,7 @@ function App() {
                   const notesLabel = rowNotes || "No notes";
                   const sourceLabel = sourceFromUrl(rowJobUrl);
                   const savedAtLabel = formatSavedAt(job.createdAt);
-                  const savedDateKey = getLocalDateKey(job.createdAt);
                   const dailyAppliedNumber = savedJobDailyNumbering.numberById.get(job.id);
-                  const dailyAppliedTotal = savedDateKey ? savedJobDailyNumbering.countByDate.get(savedDateKey) : undefined;
-                  const dailyAppliedLabel = dailyAppliedNumber ? `App #${dailyAppliedNumber}/${dailyAppliedTotal || dailyAppliedNumber}` : "Saved";
-                  const dailyAppliedTitle = dailyAppliedNumber
-                    ? `Applied job ${dailyAppliedNumber} of ${dailyAppliedTotal || dailyAppliedNumber} on ${savedAtLabel}`
-                    : `Saved on ${savedAtLabel}; not counted as applied`;
                   const rowActionBusy = savedJobsActionBusy || (editingJobId !== null && !isEditing);
                   const rowCheckboxVisibilityClass = isSelected
                     ? "opacity-100"
@@ -2607,35 +2614,42 @@ function App() {
                       </div>
                     </td>
                     <td className="px-2 py-1.5 align-top font-semibold text-[#2f333a] dark:text-[#f2ebdc]">
-                      {isEditing ? (
-                        <div className="space-y-2">
-                          <input
-                            className={tableInlineInputClass}
-                            value={editingJobDraft.jobTitle}
-                            onChange={(event) => handleEditSavedJobFieldChange("jobTitle", event.target.value)}
-                            disabled={savedJobsActionBusy}
-                            aria-label="Edit title"
-                          />
-                          <textarea
-                            className={tableInlineTextareaClass}
-                            value={editingJobDraft.notes}
-                            onChange={(event) => handleEditSavedJobFieldChange("notes", event.target.value)}
-                            disabled={savedJobsActionBusy}
-                            rows={2}
-                            placeholder="Notes"
-                            aria-label="Edit notes"
-                          />
+                      <div className="flex items-start gap-2">
+                        <span className="mt-0.5 w-7 shrink-0 text-right text-xs font-bold text-[#7a6399] dark:text-[#b8a9cf]" title={dailyAppliedNumber ? `Applied number ${dailyAppliedNumber} on ${savedAtLabel}` : ""}>
+                          {dailyAppliedNumber || ""}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          {isEditing ? (
+                            <div className="space-y-2">
+                              <input
+                                className={tableInlineInputClass}
+                                value={editingJobDraft.jobTitle}
+                                onChange={(event) => handleEditSavedJobFieldChange("jobTitle", event.target.value)}
+                                disabled={savedJobsActionBusy}
+                                aria-label="Edit title"
+                              />
+                              <textarea
+                                className={tableInlineTextareaClass}
+                                value={editingJobDraft.notes}
+                                onChange={(event) => handleEditSavedJobFieldChange("notes", event.target.value)}
+                                disabled={savedJobsActionBusy}
+                                rows={2}
+                                placeholder="Notes"
+                                aria-label="Edit notes"
+                              />
+                            </div>
+                          ) : (
+                            <div className="space-y-1">
+                              <span className="block truncate" title={titleLabel}>{titleLabel}</span>
+                              {rowNotes ? (
+                                <span className="block truncate text-[11px] font-medium text-[#666a70] dark:text-[#b8b0a0]" title={notesLabel}>
+                                  Note: {notesLabel}
+                                </span>
+                              ) : null}
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div className="space-y-1">
-                          <span className="block truncate" title={titleLabel}>{titleLabel}</span>
-                          {rowNotes ? (
-                            <span className="block truncate text-[11px] font-medium text-[#666a70] dark:text-[#b8b0a0]" title={notesLabel}>
-                              Note: {notesLabel}
-                            </span>
-                          ) : null}
-                        </div>
-                      )}
+                      </div>
                     </td>
                     <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0]">
                       {isEditing ? (
@@ -2687,17 +2701,7 @@ function App() {
                     <td className="px-2 py-1.5 align-top">
                       <span className={statusBadgeClass(job.statusLaneName)}>{displayStatusLaneLabel(job.statusLaneName)}</span>
                     </td>
-                    <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0] whitespace-nowrap">
-                      <div className="space-y-1">
-                        <span className="block">{savedAtLabel}</span>
-                        <span
-                          className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] ${dailyAppliedNumber ? "border-[#7a6399] bg-[#f3efff] text-[#4f4268] dark:border-[#8f7ab3] dark:bg-[#312b3c] dark:text-[#d8cbed]" : "border-[#8a8f9d] bg-[#edf0f5] text-[#5c626d] dark:border-[#5b6170] dark:bg-[#343840] dark:text-[#c8c0b2]"}`}
-                          title={dailyAppliedTitle}
-                        >
-                          {dailyAppliedLabel}
-                        </span>
-                      </div>
-                    </td>
+                    <td className="px-2 py-1.5 align-top text-[#3d4148] dark:text-[#e7dfd0] whitespace-nowrap">{savedAtLabel}</td>
                     <td className="px-2 py-1.5 align-top">
                       {isEditing ? (
                         <input
